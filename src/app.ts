@@ -10,12 +10,11 @@ import cors from "cors";
 
 import errorMiddleware from "./middleware/error";
 import setInterface from "./middleware/interface";
+import user from "./router/user/index"
 
 
 const app = express();
-
 app.use(express.json({ limit: '2450mb' }));
-
 app.use(express.urlencoded({ extended: true }));
 var corsOptions = {
   origin: function (origin: any, callback: any) {
@@ -38,7 +37,7 @@ const connectToDb = async () => {
   }
 };
 
-
+app.use("/", user);
 
 app.use(errorMiddleware);
 

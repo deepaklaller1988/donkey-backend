@@ -10,8 +10,8 @@ export async function checkAccessToken(accessToken: string) {
   }
 }
 
-export async function generateTokens(_id: string, role: string) {
-  var r = await jwt.sign({ user: { _id, role } }, conf.secret, {
+export async function generateTokens(_id: string) {
+  var r = await jwt.sign({ user: { _id } }, conf.secret, {
     expiresIn: conf.expiresIn,
   });
   return { accessToken: r };
