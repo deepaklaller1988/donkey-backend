@@ -140,31 +140,34 @@ const getUsers = async (req: Request, res: Response) => {
 
 const myDetails = async (req: Request, res: Response) => {
     try {
-        const { token } = req.body;
+        const token = await req.header("authorization")?.replace("Bearer ", "");
+
+        console.log(token);
         if (!token) {
             return res.sendError(res,"Token is Required");
         }
-        const decoded: any =await checkAccessToken(token); 
+        
+        const decoded: any = await checkAccessToken(token); 
         const userId = decoded.data?.user?._id;
 
-        if(!userId){
+        if (!userId) {
             return res.sendError(res,"Invalid Token");
         }
 
         const user = await User.findOne({
             where: { id: userId },
-            attributes:{exclude:["password","createdAt","updatedAt"]}
+            attributes: { exclude: ["password", "createdAt", "updatedAt"] }
         });
 
         if (!user) {
-            return res.sendError(res, "User not found");
+            return res.sendError(res,"User not found");
         }
 
-        return res.sendSuccess(res, { user });
+        return res.send({ status: true, message: 'Password changed successfully' });
 
     } catch (error: any) {
         console.error(error);
-        return res.sendError(res, "ERR_INTERNAL_SERVER_ERROR");
+        return res.sendError(res,"ERR_INTERNAL_SERVER_ERROR");
     }
 };
 
