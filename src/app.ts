@@ -15,7 +15,7 @@ import user from "./router/user/index"
 
 const app = express();
 app.use(express.json({ limit: '2450mb' }));
-app.use(express.urlencoded({ extended: true }));
+app.use(express.urlencoded({ extended: false }));
 var corsOptions = {
   origin: function (origin: any, callback: any) {
     callback(null, true);

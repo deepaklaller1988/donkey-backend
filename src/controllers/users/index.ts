@@ -1,9 +1,10 @@
 import { Request, Response } from "express";
 import User from "../../models/user.model";
-import { generateTokens } from "../../util/auth";
+import { checkAccessToken, generateTokens } from "../../util/auth";
 import * as bcrypt from 'bcrypt';
 import * as crypto from "crypto";
 import hash from "../../util/hash";
+import jwt from "jsonwebtoken";
 
 
 import UserToken from "../../models/user-token.model";
@@ -137,4 +138,34 @@ const getUsers = async (req: Request, res: Response) => {
 };
 
 
-export { createUser,getUsers,loginUser,forgotPassword,resetPassword};
+const myDetails = async (req: Request, res: Response) => {
+    try {
+        const { token } = req.body;
+        if (!token) {
+            return res.sendError(res,"Token is Required");
+        }
+        const decoded: any =await checkAccessToken(token); 
+        const userId = decoded.data?.user?._id;
+
+        if(!userId){
+            return res.sendError(res,"Invalid Token");
+        }
+
+        const user = await User.findOne({
+            where: { id: userId },
+            attributes:{exclude:["password","createdAt","updatedAt"]}
+        });
+
+        if (!user) {
+            return res.sendError(res, "User not found");
+        }
+
+        return res.sendSuccess(res, { user });
+
+    } catch (error: any) {
+        console.error(error);
+        return res.sendError(res, "ERR_INTERNAL_SERVER_ERROR");
+    }
+};
+
+export { createUser,getUsers,loginUser,forgotPassword,resetPassword,myDetails};
