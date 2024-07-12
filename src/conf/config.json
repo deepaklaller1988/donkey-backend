@@ -1,8 +1,8 @@
 {
   "development": {
     "username": "postgres",
-    "password": "123456",
-    "database": "donkey_dev",
+    "password": "root",
+    "database": "donkey",
     "host": "localhost",
     "dialect": "postgres"
   },

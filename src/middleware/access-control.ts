@@ -2,8 +2,8 @@ import { Request, Response, NextFunction } from "express";
 import { checkAccessToken } from "../util/auth";
 
 interface AuthenticatedRequest extends Request {
-    user?: any;
-  }
+  user?: any;
+}
 
 const accessControl = async (
   req: AuthenticatedRequest,
@@ -11,6 +11,7 @@ const accessControl = async (
   next: NextFunction
 ) => {
   const authToken = req.header("authorization")?.replace("Bearer ", "");
+  console.log(authToken, "auth");
   if (!authToken) {
     return res.status(401).json({
       error: {
