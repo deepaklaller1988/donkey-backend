@@ -109,6 +109,7 @@ const forgotPassword = async (req: Request, res: Response) => {
 };
 
 const resetPassword = async (req: Request, res: Response) => {
+    console.log(req.body.token,"===");
   try {
     const userToken = await UserToken.findOne({
       where: { token: req.body.token },
@@ -184,6 +185,41 @@ const myDetails = async (req: Request, res: Response) => {
   }
 };
 
+const updateUserDetails = async (req: Request, res: Response) => {
+  try {
+    const { userId, newPassword, newUsername } = req.body;
+    const user = await User.findOne({ where: { id: userId } });
+
+    if (!user) {
+      return res.sendError(res, "User not found");
+    }
+
+    let updatedFields:any = {};
+    
+    if (newPassword) {
+      const hashedPassword = await bcrypt.hash(newPassword, 10);
+      updatedFields.password = hashedPassword;
+    }
+
+    if (newUsername) {
+      updatedFields.username = newUsername;
+    }
+
+    await User.update(updatedFields, { where: { id: userId } });
+    const updatedUser = await User.findOne({ where: { id: userId } });
+
+    return res.sendSuccess(res, {
+      message: "User details updated successfully",
+      username: updatedUser.username 
+    });
+
+  } catch (error: any) {
+    console.error(error);
+    return res.sendError(res, "ERR_INTERNAL_SERVER_ERROR");
+  }
+};
+
+
 export {
   createUser,
   getUsers,
@@ -191,4 +227,5 @@ export {
   forgotPassword,
   resetPassword,
   myDetails,
+  updateUserDetails
 };
