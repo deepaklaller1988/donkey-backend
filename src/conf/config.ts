@@ -1,6 +1,6 @@
 import dotenv from "dotenv";
 // dotenv.config({ path: '.env.local' });
-dotenv.config({ path: `.env` });
+dotenv.config({ path: `.env.${process.env.NODE_ENV || 'development'}` });
 
 module.exports = {
   username: process.env.DB_USERNAME,

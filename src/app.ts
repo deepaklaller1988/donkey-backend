@@ -10,7 +10,8 @@ import cors from "cors";
 
 import errorMiddleware from "./middleware/error";
 import setInterface from "./middleware/interface";
-import user from "./router/user/index"
+import userRouter from "./router/user";
+import bookmarkRouter from "./router/bookmark";
 
 
 const app = express();
@@ -37,7 +38,8 @@ const connectToDb = async () => {
   }
 };
 
-app.use("/", user);
+app.use("/user", userRouter);
+app.use("/bookmark", bookmarkRouter);
 
 app.use(errorMiddleware);
 

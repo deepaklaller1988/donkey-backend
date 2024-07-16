@@ -2,7 +2,7 @@
   "development": {
     "username": "postgres",
     "password": "root",
-    "database": "donkey",
+    "database": "donkey_dev",
     "host": "localhost",
     "dialect": "postgres"
   },

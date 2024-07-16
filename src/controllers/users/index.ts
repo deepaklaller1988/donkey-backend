@@ -147,22 +147,9 @@ const getUsers = async (req: Request, res: Response) => {
 
 const myDetails = async (req: Request, res: Response) => {
   try {
-    const authorizationHeader = req.header("Authorization");
-    if (!authorizationHeader) {
-      return res.sendError(res, "Token is Required");
-    }
+    const authenticatedReq = req as any;
 
-    const token = authorizationHeader.replace("Bearer ", "");
-    if (!token) {
-      return res.sendError(res, "Token is Required");
-    }
-
-    const decoded: any = await checkAccessToken(token);
-    if (!decoded) {
-      return res.sendError(res, "Invalid Token");
-    }
-
-    const userId = decoded.data?.user?._id;
+    const userId = authenticatedReq.user._id;
     if (!userId) {
       return res.sendError(res, "Invalid Token");
     }
