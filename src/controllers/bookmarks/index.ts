@@ -5,6 +5,17 @@ import BookMarks from "../../models/bookmark.model";
 
 const createBookmark = async (req: Request, res: Response) => {
     try {
+      const isExist = await BookMarks.findOne({
+        where: {
+          user_id: req.body.userId,
+          media_id: typeof(req.body.mediaId) === 'string' ? req.body.mediaId : req.body.mediaId.toString(),
+          media_type: req.body.mediaType,
+        }
+      })
+
+      if(isExist){
+        return res.sendError(res, "It's already exist in bookmarks.");
+      }
       const data = {
         user_id: req.body.userId,
         media_id: req.body.mediaId,
@@ -35,7 +46,7 @@ const createBookmark = async (req: Request, res: Response) => {
             whereCondition.bookmark_type = bookmarkType;
         }
 
-        if (!req.query.userId) {
+        if (!req.query.userId || req.query.userId == 'undefined') {
             return res.sendError(res, "User ID missing");
         }
         
@@ -62,7 +73,7 @@ const createBookmark = async (req: Request, res: Response) => {
                     ['id', sortOrder], // Sort the results based on the 'username' field and the specified order
                 ],
             });
-            return res.sendSuccess(res, { bookMarks });
+            return res.sendSuccess(res,  bookMarks);
         }
     } catch (error: any) {
       console.log(error);
