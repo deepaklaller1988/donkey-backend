@@ -4,7 +4,6 @@ import { checkAccessToken, generateTokens } from "../../util/auth";
 import * as bcrypt from "bcrypt";
 import * as crypto from "crypto";
 import hash from "../../util/hash";
-import jwt from "jsonwebtoken";
 
 import UserToken from "../../models/user-token.model";
 import { sendForgotEmail } from "../../provider/send-mail";
