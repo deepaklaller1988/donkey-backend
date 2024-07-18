@@ -90,7 +90,9 @@ const createBookmark = async (req: Request, res: Response) => {
 
       const bookmark = await BookMarks.update(data, {
         where:{
-            id: req.body.id,
+          user_id: req.body.userId,
+          media_id: typeof(req.body.mediaId) === 'string' ? req.body.mediaId : req.body.mediaId.toString(),
+          media_type: req.body.mediaType,
         }
       });
       return res.sendSuccess(res,  bookmark );
@@ -104,8 +106,10 @@ const createBookmark = async (req: Request, res: Response) => {
   const deleteBookmark = async (req: Request, res: Response) => {
     try {
       const bookmark = await BookMarks.destroy({
-        where: {
-            id: req.body.id
+        where:{
+          user_id: req.body.userId,
+          media_id: typeof(req.body.mediaId) === 'string' ? req.body.mediaId : req.body.mediaId.toString(),
+          media_type: req.body.mediaType,
         }
     });
       return res.sendSuccess(res,  bookmark );
