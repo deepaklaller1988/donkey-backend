@@ -4,7 +4,6 @@ import { checkAccessToken, generateTokens } from "../../util/auth";
 import * as bcrypt from "bcrypt";
 import * as crypto from "crypto";
 import hash from "../../util/hash";
-import jwt from "jsonwebtoken";
 
 import UserToken from "../../models/user-token.model";
 import { sendForgotEmail } from "../../provider/send-mail";
@@ -28,7 +27,7 @@ const createUser = async (req: Request, res: Response) => {
     });
 
     if (usernameExists) {
-      return res.sendError(res, "Username already exists");
+      return res.sendError(res, "ERR_AUTH_USERNAME");
     }
     const userCreated = {
       username: req.body.username,
@@ -109,7 +108,7 @@ const forgotPassword = async (req: Request, res: Response) => {
 };
 
 const resetPassword = async (req: Request, res: Response) => {
-    console.log(req.body.token,"===");
+  console.log(req.body.token, "===");
   try {
     const userToken = await UserToken.findOne({
       where: { token: req.body.token },
@@ -181,8 +180,8 @@ const updateUserDetails = async (req: Request, res: Response) => {
       return res.sendError(res, "User not found");
     }
 
-    let updatedFields:any = {};
-    
+    let updatedFields: any = {};
+
     if (newPassword) {
       const hashedPassword = await bcrypt.hash(newPassword, 10);
       updatedFields.password = hashedPassword;
@@ -197,15 +196,13 @@ const updateUserDetails = async (req: Request, res: Response) => {
 
     return res.sendSuccess(res, {
       message: "User details updated successfully",
-      username: updatedUser.username 
+      username: updatedUser.username,
     });
-
   } catch (error: any) {
     console.error(error);
     return res.sendError(res, "ERR_INTERNAL_SERVER_ERROR");
   }
 };
-
 
 export {
   createUser,
@@ -214,5 +211,5 @@ export {
   forgotPassword,
   resetPassword,
   myDetails,
-  updateUserDetails
+  updateUserDetails,
 };
