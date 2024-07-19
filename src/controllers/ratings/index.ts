@@ -1,9 +1,10 @@
 import { Request, Response } from "express";
-import { Op } from "sequelize";
+import { Op, Sequelize } from "sequelize";
 import Ratings from "../../models/ratings.model"
 
 const createRating = async (req: Request, res: Response) => {
-    const { value, movieId, userId } = req.body;
+    const { value, movieId, userId, ip } = req.body;
+
     if (value < 0.5 || value > 5) {
         return res.sendError(res, "Invalid rating value. Must be between 1 and 5.");
     }
@@ -18,13 +19,12 @@ const createRating = async (req: Request, res: Response) => {
 
         if (existingRating) {
             return res.sendError(res, "You have already rated this movie");
-
         }
 
         const newRating = await Ratings.create({
             movieId,
             value,
-            ipAddress: req.ip,
+            ipAddress: ip,
             userId: userId ? userId : null,
         });
 
@@ -37,36 +37,44 @@ const createRating = async (req: Request, res: Response) => {
 }
 
 const getRatings = async (req: Request, res: Response) => {
-    const { movieId, userId ,ip} = req.params
-    console.log(userId,"==")
-    
+    const { movieId, id, ip } = req.query;
+
     try {
-        let rating;
+        let whereCondition: any = {};
 
-        const whereCondition = {
-            movieId,
-            [Op.or]: [
-                { userId: userId || null }, 
-                { ipAddress: ip || null }    
-            ]
-        };
+        if (movieId) {
+            whereCondition.movieId = movieId;
+        }
+        if (ip) {
+            whereCondition.ipAddress = {
+                [Op.like]: '%' + ip + '%'
+            };
+        }
+        else if (id !== "null") {
+            whereCondition.userId = String(id);
+        }
 
-        rating = await Ratings.findOne({
+        const rating = await Ratings.findOne({
             where: whereCondition
         });
 
-        if (!rating) {
-            return res.sendError(res, "Rating Not Found")
 
+        if (!rating) {
+            return res.sendError(res, "Rating Not Found");
         }
 
-        return res.sendSuccess(res, { rating });
+        let ratingCount = await Ratings.findOne({
+            attributes: [
+                [Sequelize.fn('AVG', Sequelize.literal("CAST(value AS INTEGER)")), 'rating'],
+                [Sequelize.fn('COUNT', Sequelize.literal('DISTINCT id')), 'total'],
+
+        ]})
+
+        return res.sendSuccess(res, { rating ,ratingCount});
     } catch (error: any) {
-        console.log(error,"=========")
-        return res.sendError(res, "You have already rated this movie");
-
+        console.error('Error retrieving rating:', error);
+        return res.sendError(res, error.message);
     }
-
-}
+};
 
 export { createRating, getRatings }
