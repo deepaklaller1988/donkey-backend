@@ -3,7 +3,7 @@ import { Op, Sequelize } from "sequelize";
 import Ratings from "../../models/ratings.model"
 
 const createRating = async (req: Request, res: Response) => {
-    const { value, movieId, userId, ip } = req.body;
+    const { value, movieId, userId, ip ,mediaType} = req.body;
 
     if (value < 0.5 || value > 5) {
         return res.sendError(res, "Invalid rating value. Must be between 1 and 5.");
@@ -13,7 +13,8 @@ const createRating = async (req: Request, res: Response) => {
         const existingRating = await Ratings.findOne({
             where: {
                 userId,
-                movieId
+                movieId,
+                mediaType
             }
         });
 
@@ -26,6 +27,7 @@ const createRating = async (req: Request, res: Response) => {
             value,
             ipAddress: ip,
             userId: userId ? userId : null,
+            mediaType
         });
 
         return res.sendSuccess(res, newRating);
@@ -37,13 +39,16 @@ const createRating = async (req: Request, res: Response) => {
 }
 
 const getRatings = async (req: Request, res: Response) => {
-    const { movieId, id, ip } = req.query;
+    const { movieId, id, ip ,mediaType } = req.query;
 
     try {
         let whereCondition: any = {};
 
         if (movieId) {
             whereCondition.movieId = movieId;
+        }
+        if (mediaType) {
+            whereCondition.mediaType = mediaType;
         }
         if (ip) {
             whereCondition.ipAddress = {
@@ -60,7 +65,7 @@ const getRatings = async (req: Request, res: Response) => {
 
 
         if (!rating) {
-            return res.sendError(res, "Rating Not Found");
+            return res.sendSuccess(res, {rating:0});
         }
 
         let ratingCount = await Ratings.findOne({

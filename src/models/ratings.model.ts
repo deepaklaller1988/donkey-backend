@@ -21,6 +21,10 @@ const Ratings = db.define('ratings', {
     value: {
         type: DataTypes.STRING
     },
+    mediaType:{
+        type: DataTypes.STRING
+
+    }
 });
 
 Ratings.sync()
