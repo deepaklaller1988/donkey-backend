@@ -5,7 +5,7 @@ import Ratings from "../../models/ratings.model"
 const createRating = async (req: Request, res: Response) => {
     const { value, movieId, userId, ip ,mediaType} = req.body;
 
-    if (value < 0.5 || value > 5) {
+    if (value < 0 || value > 5) {
         return res.sendError(res, "Invalid rating value. Must be between 1 and 5.");
     }
 
@@ -67,14 +67,15 @@ const getRatings = async (req: Request, res: Response) => {
         if (!rating) {
             return res.sendSuccess(res, {rating:0});
         }
-
-        let ratingCount = await Ratings.findOne({
+       
+          const ratingCount = await Ratings.findOne({
             attributes: [
-                [Sequelize.fn('AVG', Sequelize.literal("CAST(value AS INTEGER)")), 'rating'],
-                [Sequelize.fn('COUNT', Sequelize.literal('DISTINCT id')), 'total'],
-
-        ]})
-
+              [Sequelize.literal('AVG(CAST("value" AS NUMERIC))'), 'rating'],
+              [Sequelize.fn('COUNT', Sequelize.fn('DISTINCT', Sequelize.col('id'))), 'total']
+            ]
+          });
+          
+        
         return res.sendSuccess(res, { rating ,ratingCount});
     } catch (error: any) {
         console.error('Error retrieving rating:', error);
