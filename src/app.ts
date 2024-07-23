@@ -13,6 +13,7 @@ import setInterface from "./middleware/interface";
 import userRouter from "./router/user";
 import bookmarkRouter from "./router/bookmark";
 import ratingRouter from "./router/rating"
+import countingRouter from "./router/socialcount"
 
 
 const app = express();
@@ -42,6 +43,7 @@ const connectToDb = async () => {
 app.use("/user", userRouter);
 app.use("/bookmark", bookmarkRouter);
 app.use("/rating", ratingRouter);
+app.use("/socialcount", countingRouter);
 
 app.use(errorMiddleware);
 
