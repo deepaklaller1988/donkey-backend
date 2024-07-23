@@ -69,6 +69,8 @@ const getRatings = async (req: Request, res: Response) => {
         }
        
           const ratingCount = await Ratings.findOne({
+            where: whereCondition,
+
             attributes: [
               [Sequelize.literal('AVG(CAST("value" AS NUMERIC))'), 'rating'],
               [Sequelize.fn('COUNT', Sequelize.fn('DISTINCT', Sequelize.col('id'))), 'total']
