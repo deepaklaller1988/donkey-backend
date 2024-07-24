@@ -14,6 +14,7 @@ import userRouter from "./router/user";
 import bookmarkRouter from "./router/bookmark";
 import ratingRouter from "./router/rating"
 import countingRouter from "./router/socialcount"
+import mediaProgressRouter from "./router/movieprogress"
 
 
 const app = express();
@@ -44,6 +45,7 @@ app.use("/user", userRouter);
 app.use("/bookmark", bookmarkRouter);
 app.use("/rating", ratingRouter);
 app.use("/socialcount", countingRouter);
+app.use("/mediaprogress", mediaProgressRouter);
 
 app.use(errorMiddleware);
 

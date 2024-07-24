@@ -3,7 +3,7 @@ import { Op, Sequelize } from "sequelize";
 import Ratings from "../../models/ratings.model"
 
 const createRating = async (req: Request, res: Response) => {
-    const { value, movieId, userId, ip ,mediaType} = req.body;
+    const { value, movieId, userId, ip, mediaType } = req.body;
 
     if (value < 0 || value > 5) {
         return res.sendError(res, "Invalid rating value. Must be between 1 and 5.");
@@ -21,7 +21,7 @@ const createRating = async (req: Request, res: Response) => {
         if (existingRating) {
             return res.sendError(res, "You have already rated this movie");
         }
-
+        // const newValue = value * 2
         const newRating = await Ratings.create({
             movieId,
             value,
@@ -39,7 +39,7 @@ const createRating = async (req: Request, res: Response) => {
 }
 
 const getRatings = async (req: Request, res: Response) => {
-    const { movieId, id, ip ,mediaType } = req.query;
+    const { movieId, id, ip, mediaType } = req.query;
 
     try {
         let whereCondition: any = {};
@@ -65,20 +65,21 @@ const getRatings = async (req: Request, res: Response) => {
 
 
         if (!rating) {
-            return res.sendSuccess(res, {rating:0});
+            return res.sendSuccess(res, { rating: 0 });
         }
-       
-          const ratingCount = await Ratings.findOne({
+
+        const ratingCount = await Ratings.findOne({
             where: whereCondition,
 
             attributes: [
-              [Sequelize.literal('AVG(CAST("value" AS NUMERIC))'), 'rating'],
-              [Sequelize.fn('COUNT', Sequelize.fn('DISTINCT', Sequelize.col('id'))), 'total']
+                //   [Sequelize.literal('AVG(CAST("value" AS NUMERIC))'), 'rating'],
+                [Sequelize.literal('AVG(CAST("value" AS NUMERIC)) * 2'), 'rating'],
+                [Sequelize.fn('COUNT', Sequelize.fn('DISTINCT', Sequelize.col('id'))), 'total']
             ]
-          });
-          
-        
-        return res.sendSuccess(res, { rating ,ratingCount});
+        });
+
+
+        return res.sendSuccess(res, { rating, ratingCount });
     } catch (error: any) {
         console.error('Error retrieving rating:', error);
         return res.sendError(res, error.message);
