@@ -18,7 +18,7 @@ const MovieProgress = db.define('movieprogresses', {
     allowNull: false,
   },
   media_type: {
-    type: DataTypes.NUMBER,
+    type: DataTypes.STRING,
     allowNull: false,
   },
   progress_time: {

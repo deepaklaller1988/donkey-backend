@@ -3,8 +3,9 @@ import MovieProgress from "../../models/movieprogress";
 
 const postData = async (req: Request, res: Response) => {
     const { user_id, media_id, media_type, progress_time } = req.body;
+    console.log(user_id,media_id,media_type,progress_time,"================")
 
-    if (user_id && media_id && media_type && progress_time) {
+    if (!user_id && !media_id && !media_type && !progress_time) {
         return res.sendError(res, "userId,MediaId,type is Required");
     }
     try {
