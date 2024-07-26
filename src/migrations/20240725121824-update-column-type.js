@@ -6,6 +6,9 @@ module.exports = {
     await queryInterface.changeColumn('movieprogresses', 'media_id', {
       type: Sequelize.STRING,
     });
+    await queryInterface.changeColumn('movieprogresses', 'media_type', {
+      type: Sequelize.STRING,
+    });
 },
 
   async down (queryInterface, Sequelize) {
