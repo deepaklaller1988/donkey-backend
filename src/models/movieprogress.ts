@@ -10,7 +10,7 @@ const MovieProgress = db.define('movieprogresses', {
     type: DataTypes.INTEGER
   },
   user_id: {
-    type: DataTypes.NUMBER,
+    type: DataTypes.INTEGER,
     allowNull: false,
   },
   media_id: {
