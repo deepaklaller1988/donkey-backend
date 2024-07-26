@@ -1,10 +1,10 @@
-import {getListofWatching, postData} from "../../controllers/movieprogress";
+import {getListofWatching, getMovieData,} from "../../controllers/movieprogress";
 import { Router } from "express";
 
 const router = Router();
 // router.use(accessControl)
 router.get("/", getListofWatching);
-router.post('/', postData);
+router.post('/', getMovieData);
 
 
 
