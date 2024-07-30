@@ -46,15 +46,12 @@ const getContinue = async (req: Request, res: Response) => {
 
   try {
     const {rows,count} = await MovieProgress.findAndCountAll({
-      where: { user_id:user_id, status: true },
-      order: [['progress_time', sortOrder]],
+      where: { user_id:user_id },
+      order: [['updatedAt', 'desc']],
       limit:limit,
       offset:offset
     });
-    if (rows.length === 0) {
-      return res.sendError(res, "No watching progress found.");
 
-    }
     return res.sendPaginationSuccess(res, rows,count);
 
   } catch (error: any) {
