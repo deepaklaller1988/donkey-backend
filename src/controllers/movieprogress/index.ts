@@ -46,15 +46,12 @@ const getContinue = async (req: Request, res: Response) => {
 
   try {
     const {rows,count} = await MovieProgress.findAndCountAll({
-      where: { user_id:user_id, status: true },
-      order: [['progress_time', sortOrder]],
+      where: { user_id:user_id },
+      order: [['updatedAt', 'desc']],
       limit:limit,
       offset:offset
     });
-    if (rows.length === 0) {
-      return res.sendSuccess(res, {message:"No watching progress found"});
 
-    }
     return res.sendPaginationSuccess(res, rows,count);
 
   } catch (error: any) {
@@ -67,10 +64,12 @@ const deleteContinue = async (req: Request, res: Response) => {
 
     const data = await MovieProgress.destroy({
       where: {
-        id: req.body.id,
+        user_id: req.body.userId,
+        media_id: typeof(req.body.mediaId) === 'string' ? req.body.mediaId : req.body.mediaId.toString(),
+        media_type: req.body.mediaType,
       },
     });
-    res.sendSuccess(res, { data });
+    res.sendSuccess(res, data);
   } catch (error: any) {
     return res.sendError(res, error.message);
   }
