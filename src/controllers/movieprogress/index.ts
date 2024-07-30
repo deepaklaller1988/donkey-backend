@@ -67,10 +67,12 @@ const deleteContinue = async (req: Request, res: Response) => {
 
     const data = await MovieProgress.destroy({
       where: {
-        id: req.body.id,
+        user_id: req.body.userId,
+        media_id: typeof(req.body.mediaId) === 'string' ? req.body.mediaId : req.body.mediaId.toString(),
+        media_type: req.body.mediaType,
       },
     });
-    res.sendSuccess(res, { data });
+    res.sendSuccess(res, data);
   } catch (error: any) {
     return res.sendError(res, error.message);
   }
