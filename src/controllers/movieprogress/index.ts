@@ -52,7 +52,7 @@ const getContinue = async (req: Request, res: Response) => {
       offset:offset
     });
     if (rows.length === 0) {
-      return res.sendError(res, "No watching progress found.");
+      return res.sendSuccess(res, {message:"No watching progress found"});
 
     }
     return res.sendPaginationSuccess(res, rows,count);
