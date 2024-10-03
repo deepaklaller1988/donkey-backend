@@ -72,7 +72,6 @@ const getRatingFromMDBAPI = async (mediaId: any, mediaType: any) =>{
     // const response = await fetch(`https://mdblist.com/api/?apikey=${apiKey}&tm=${mediaId}&m=${mediaType.toLowerCase() ==='movie' ? 'movie' : 'show'}`);
     const response = await fetch(`https://api.mdblist.com/tmdb/${mediaType.toLowerCase() ==='movie' ? 'movie' : 'show'}/${mediaId}?apikey=${apiKey}`);
     const ratingData = await response.json();
-    console.log(ratingData)
 
     if(ratingData){
         if(ratingData.ratings && ratingData.ratings.length > 0){
