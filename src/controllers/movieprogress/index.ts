@@ -2,7 +2,7 @@ import { Request, Response } from "express";
 import MovieProgress from "../../models/movieprogress";
 
 const postContinue = async (req: Request, res: Response) => {
-  const { user_id, media_id, media_type, progress_time } = req.body;
+  const { user_id, media_id, media_type, progress_time ,season_id,episode_id} = req.body;
 
   if (!user_id && !media_id && !media_type && !progress_time) {
     return res.sendError(res, "userId, MediaId, mediaType, and progressTime are required.");
@@ -11,6 +11,10 @@ const postContinue = async (req: Request, res: Response) => {
     const existingProgress = await MovieProgress.findOne({ where: { user_id, media_id, media_type } });
     if (existingProgress) {
       existingProgress.progress_time = progress_time;
+      if (media_type === 'tv') {
+        existingProgress.season_id = season_id;
+        existingProgress.episode_id = episode_id;
+      }
       await existingProgress.save();
       return res.sendSuccess(res, existingProgress);
 
@@ -21,6 +25,8 @@ const postContinue = async (req: Request, res: Response) => {
         media_type,
         progress_time,
         status: true,
+        ...(media_type === 'tv' && { season_id, episode_id }),
+
       });
       return res.sendSuccess(res, newProgress);
     }

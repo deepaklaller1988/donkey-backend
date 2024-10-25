@@ -17,6 +17,14 @@ const MovieProgress = db.define('movieprogresses', {
     type: DataTypes.STRING,
     allowNull: false,
   },
+  season_id: {
+    type: DataTypes.STRING,
+    allowNull: true,
+  },
+  episode_id: {
+    type: DataTypes.STRING,
+    allowNull: true,
+  },
   media_type: {
     type: DataTypes.STRING,
     allowNull: false,
@@ -45,3 +53,4 @@ MovieProgress.associate = (models:any) =>{
 MovieProgress.sync()
 
 export default MovieProgress;
+
