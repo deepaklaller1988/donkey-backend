@@ -65,6 +65,33 @@ const getContinue = async (req: Request, res: Response) => {
   }
 }
 
+const getContinueFortv = async (req: Request, res: Response) => {
+  const sortOrder = req.query.sort || 'desc';
+  const page = Number(req.query.page) || 1;
+  const limit = Number(req.query.limit) || 10;
+  const offset = (page - 1) * limit;
+
+  const { media_id } = req.query;
+  if (!media_id) {
+    return res.sendError(res, "Media Id is Required.");
+
+  }
+
+  try {
+    const {rows,count} = await MovieProgress.findAndCountAll({
+      where: { user_id:user_id },
+      order: [['updatedAt', 'desc']],
+      limit:limit,
+      offset:offset
+    });
+
+    return res.sendPaginationSuccess(res, rows,count);
+
+  } catch (error: any) {
+    return res.sendError(res, error.message);
+  }
+}
+
 const deleteContinue = async (req: Request, res: Response) => {
   try {
 
