@@ -35,7 +35,6 @@ const postContinue = async (req: Request, res: Response) => {
     console.error('Error saving progress:', error);
     return res.sendError(res, error.message);
   }
-
 }
 
 const getContinue = async (req: Request, res: Response) => {
@@ -66,31 +65,32 @@ const getContinue = async (req: Request, res: Response) => {
 }
 
 const getContinueFortv = async (req: Request, res: Response) => {
-  const sortOrder = req.query.sort || 'desc';
-  const page = Number(req.query.page) || 1;
-  const limit = Number(req.query.limit) || 10;
-  const offset = (page - 1) * limit;
-
-  const { media_id } = req.query;
-  if (!media_id) {
-    return res.sendError(res, "Media Id is Required.");
-
-  }
+  const { user_id, media_type, media_id } = req.query;
 
   try {
-    const {rows,count} = await MovieProgress.findAndCountAll({
-      where: { user_id:user_id },
-      order: [['updatedAt', 'desc']],
-      limit:limit,
-      offset:offset
+    const userProgress = await MovieProgress.findAll({
+      where: {
+        user_id: user_id,
+        media_type: media_type,
+        media_id: media_id ,
+        
+      }
     });
 
-    return res.sendPaginationSuccess(res, rows,count);
+    if (userProgress.length === 0) {
+      return res.sendSuccess(res,{ message: 'No progress found for this user' });
+
+    }
+    return res.sendSuccess(res,userProgress);
 
   } catch (error: any) {
+    console.error("Error fetching user progress:", error);
     return res.sendError(res, error.message);
+
   }
-}
+};
+
+
 
 const deleteContinue = async (req: Request, res: Response) => {
   try {
@@ -108,4 +108,4 @@ const deleteContinue = async (req: Request, res: Response) => {
   }
 }
 
-export { postContinue, getContinue, deleteContinue }
+export { postContinue, getContinue, deleteContinue ,getContinueFortv}
