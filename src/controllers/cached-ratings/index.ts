@@ -7,6 +7,10 @@ const apiKey = process.env.NEXT_PUBLIC_MDBKEY;
 const getCachedRatings = async (req: Request, res: Response) =>{
     const { mediaId, mediaType }: any = req.query;
     try {
+        if (!mediaId || !mediaType) {
+            console.log("Media Id or Media Type is missing")
+            return res.sendError(res, "Media Id or Media Type is missing");
+        }
 
         const findRating = await IMDBRating.findOne({
             where:{
