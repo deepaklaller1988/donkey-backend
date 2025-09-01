@@ -10,64 +10,95 @@ import { sendForgotEmail } from "../../provider/send-mail";
 
 const createUser = async (req: Request, res: Response) => {
   try {
-    const emailExists = await User.findOne({
-      where: {
-        email: req.body.email,
-      },
+     const emailExists = await User.findOne({
+      where: { email: req.body.email },
     });
 
     if (emailExists) {
-      return res.sendError(res, "ERR_AUTH_USERNAME_OR_EMAIL_ALREADY_EXIST");
+      return res.status(400).json({
+        success: false,
+        message: "Email already exists",
+        code: "ERR_AUTH_USERNAME_OR_EMAIL_ALREADY_EXIST",
+      });
     }
-    const hashedPassword = await bcrypt.hash(req.body.password, 10);
-    const usernameExists = await User.findOne({
-      where: {
-        username: req.body.username,
-      },
+
+     const hashedPassword = await bcrypt.hash(req.body.password, 10);
+
+     const usernameExists = await User.findOne({
+      where: { username: req.body.username },
     });
 
     if (usernameExists) {
-      return res.sendError(res, "ERR_AUTH_USERNAME");
+      return res.status(400).json({
+        success: false,
+        message: "Username already exists",
+        code: "ERR_AUTH_USERNAME",
+      });
     }
-    const userCreated = {
+
+     const userCreated = {
       username: req.body.username,
       email: req.body.email,
       password: hashedPassword,
     };
     const user = await User.create(userCreated);
-    var { accessToken } = await generateTokens(user.dataValues.id);
-    return res.sendSuccess(res, { user, accessToken });
+
+     const { accessToken } = await generateTokens(user.dataValues.id);
+
+    return res.status(201).json({
+      success: true,
+      message: "User created successfully",
+      data: { user, accessToken },
+    });
   } catch (error: any) {
-    console.log(error);
-    return res.sendError(res, "ERR_INTERNAL_SERVER_ERROR");
+    console.error(error);
+    return res.status(500).json({
+      success: false,
+      message: "Internal Server Error",
+      code: "ERR_INTERNAL_SERVER_ERROR",
+    });
   }
 };
+
 
 const loginUser = async (req: Request, res: Response) => {
   try {
     const { email, password } = req.body;
-    const user = await User.findOne({
-      where: {
-        email: email,
-      },
-    });
 
+     const user = await User.findOne({ where: { email } });
     if (!user) {
-      return res.sendError(res, "Email Not Found");
+      return res.status(404).json({
+        success: false,
+        message: "Email not found",
+        code: "ERR_AUTH_EMAIL_NOT_FOUND",
+      });
     }
 
-    const passwordMatch = await bcrypt.compare(password, user.password);
-
+     const passwordMatch = await bcrypt.compare(password, user.password);
     if (!passwordMatch) {
-      return res.sendError(res, "Password Not Matched");
+      return res.status(401).json({
+        success: false,
+        message: "Invalid password",
+        code: "ERR_AUTH_PASSWORD_NOT_MATCHED",
+      });
     }
-    var { accessToken } = await generateTokens(user.dataValues.id);
-    return res.sendSuccess(res, { user, accessToken });
+
+     const { accessToken } = await generateTokens(user.dataValues.id);
+    return res.status(200).json({
+      success: true,
+      message: "Login successful",
+      data: { user, accessToken },
+    });
   } catch (error: any) {
     console.error(error);
-    return res.sendError(res, "ERR_INTERNAL_SERVER_ERROR");
+    return res.status(500).json({
+      success: false,
+      message: "Internal Server Error",
+      code: "ERR_INTERNAL_SERVER_ERROR",
+    });
   }
 };
+
 
 const forgotPassword = async (req: Request, res: Response) => {
   try {
