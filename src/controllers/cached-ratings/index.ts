@@ -11,6 +11,10 @@ const getCachedRatings = async (req: Request, res: Response) =>{
             console.log("Media Id or Media Type is missing")
             return res.sendError(res, "Media Id or Media Type is missing");
         }
+        if (!mediaId || !mediaType) {
+            console.log("Media Id or Media Type is missing")
+            return res.sendError(res, "Media Id or Media Type is missing");
+        }
 
         const findRating = await IMDBRating.findOne({
             where:{
