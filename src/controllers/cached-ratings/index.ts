@@ -33,7 +33,7 @@ const getCachedRatings = async (req: Request, res: Response) =>{
                 return res.sendSuccess(res, findRating);
             }else{
                 const data = await getRatingFromMDBAPI(mediaId, mediaType);
-                if(data){
+                if (data !== null && data !== undefined) {
                     let update = {
                         imdb_rating : Number(data),
                         cached_date: now
@@ -51,7 +51,7 @@ const getCachedRatings = async (req: Request, res: Response) =>{
             }
         }else{
             const data = await getRatingFromMDBAPI(mediaId, mediaType);
-            if(data){
+            if (data !== null && data !== undefined){
                 let update = {
                     media_id: Number(mediaId),
                     media_type: mediaType ? mediaType.toLowerCase() : mediaType,
@@ -83,7 +83,11 @@ const getRatingFromMDBAPI = async (mediaId: any, mediaType: any) =>{
 
     if(ratingData){
         if(ratingData.ratings && ratingData.ratings.length > 0){
-          imdbRating = ratingData.ratings.find((rating: any) => rating.source === "imdb").value;
+        const imdb = ratingData?.ratings?.find(
+            (rating: any) => rating.source === "imdb"
+            );
+
+            imdbRating = imdb?.value || null;
         }
       }
       return imdbRating;
