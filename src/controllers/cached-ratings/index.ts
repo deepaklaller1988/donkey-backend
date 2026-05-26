@@ -78,8 +78,30 @@ const getRatingFromMDBAPI = async (mediaId: any, mediaType: any) =>{
     try {
         let imdbRating = null;
     // const response = await fetch(`https://mdblist.com/api/?apikey=${apiKey}&tm=${mediaId}&m=${mediaType.toLowerCase() ==='movie' ? 'movie' : 'show'}`);
-    const response = await fetch(`https://api.mdblist.com/tmdb/${mediaType.toLowerCase() ==='movie' ? 'movie' : 'show'}/${mediaId}?apikey=${apiKey}`);
-    console.log("resposne----------",mediaId, mediaType, response)
+    const response = await fetch(
+    `https://api.mdblist.com/tmdb/${
+        mediaType.toLowerCase() === "movie" ? "movie" : "show"
+    }/${mediaId}?apikey=${apiKey}`,
+    {
+        headers: {
+        "User-Agent":
+            "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/125.0.0.0 Safari/537.36",
+        "Accept": "application/json",
+        "Referer": "https://mdblist.com/",
+        "Origin": "https://mdblist.com"
+        }
+    }
+    );
+     console.log("resposne----------",mediaId, mediaType, response)
+     if (!response.ok) {
+        console.log("MDB Error:", response.status);
+        return null;
+    }
+    const contentType = response.headers.get("content-type");
+
+    if (!contentType?.includes("application/json")) {
+    return null;
+    }
     const ratingData = await response.json();
     console.log("ratingData-----",ratingData)
     if(ratingData){
