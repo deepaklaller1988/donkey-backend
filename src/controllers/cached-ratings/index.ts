@@ -23,13 +23,13 @@ const getCachedRatings = async (req: Request, res: Response) =>{
             const cachedAt = moment(findRating.cached_date);
             const now = moment();
 
-            // Check if data is still within the 2-day validity period
-            if (now.diff(cachedAt, 'days') < 2) {
+            // Check if data is still within the 4-day validity period
+            if (now.diff(cachedAt, 'days') < 4) {
                 console.log('Serving from cache');
                 return res.sendSuccess(res, findRating);
             }else{
                 const data = await getRatingFromMDBAPI(mediaId, mediaType);
-                if(data){
+                if (data !== null && data !== undefined) {
                     let update = {
                         imdb_rating : Number(data),
                         cached_date: now
@@ -47,7 +47,7 @@ const getCachedRatings = async (req: Request, res: Response) =>{
             }
         }else{
             const data = await getRatingFromMDBAPI(mediaId, mediaType);
-            if(data){
+            if (data !== null && data !== undefined){
                 let update = {
                     media_id: Number(mediaId),
                     media_type: mediaType ? mediaType.toLowerCase() : mediaType,
@@ -74,12 +74,39 @@ const getRatingFromMDBAPI = async (mediaId: any, mediaType: any) =>{
     try {
         let imdbRating = null;
     // const response = await fetch(`https://mdblist.com/api/?apikey=${apiKey}&tm=${mediaId}&m=${mediaType.toLowerCase() ==='movie' ? 'movie' : 'show'}`);
-    const response = await fetch(`https://api.mdblist.com/tmdb/${mediaType.toLowerCase() ==='movie' ? 'movie' : 'show'}/${mediaId}?apikey=${apiKey}`);
-    const ratingData = await response.json();
+    const response = await fetch(
+    `https://api.mdblist.com/tmdb/${
+        mediaType.toLowerCase() === "movie" ? "movie" : "show"
+    }/${mediaId}?apikey=${apiKey}`,
+    {
+        headers: {
+        "User-Agent":
+            "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/125.0.0.0 Safari/537.36",
+        "Accept": "application/json",
+        "Referer": "https://mdblist.com/",
+        "Origin": "https://mdblist.com"
+        }
+    }
+    );
+     console.log("resposne----------",mediaId, mediaType, response)
+     if (!response.ok) {
+        console.log("MDB Error:", response.status);
+        return null;
+    }
+    const contentType = response.headers.get("content-type");
 
+    if (!contentType?.includes("application/json")) {
+    return null;
+    }
+    const ratingData = await response.json();
+    console.log("ratingData-----",ratingData)
     if(ratingData){
         if(ratingData.ratings && ratingData.ratings.length > 0){
-          imdbRating = ratingData.ratings.find((rating: any) => rating.source === "imdb").value;
+        const imdb = ratingData?.ratings?.find(
+            (rating: any) => rating.source === "imdb"
+            );
+
+            imdbRating = imdb?.value || null;
         }
       }
       return imdbRating;
